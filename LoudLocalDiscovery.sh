@@ -72,5 +72,15 @@ timestamp=`date +%Y_%m_%d`
 # Launch arp-scan and populate active IP address list
 echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}arp-scan${RESET} on $range"
 arp_scan $range
-# redirect to client assessment directory file and timestamp the filename
+# clean up arp-scan output, redirect to client assessment directory file and timestamp the filename
 sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/&/gp' /tmp/test.txt > "${clientdir}/${timestamp}-targets.txt"
+# Launch sn1per <targetfile.txt> airstrike
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}sniper airstrike${RESET} on $range"
+/opt/sniper-git/sniper "${clientdir}/${timestamp}-targets.txt" airstrike
+# move sniper data to clientdir
+mv /opt/sniper-git/loot/* "$clientdir"
+# eyewitness
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}EyeWitness${RESET} on $range"
+/opt/eyewitness-git/EyeWitness.py --all-protocols -f "${clientdir}/${timestamp}-targets.txt" -d "$clientdir" --cycle All
+# move eyewitness files to clientdir
+mv /opt/eyewitness-git/"$client"/* "$clientdir"
