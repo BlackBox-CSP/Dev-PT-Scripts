@@ -61,6 +61,16 @@ read range
 # Validate range is in proper format
 valid_ip $range
 
+# Read input, ask if intrusive tests should be performed
+#read -r -p "Are we running more intrusive tests today? [y/n] " response
+#response=${response,,}  #tolower
+#if [[ $response =~ ^(y)$ ]]; then
+#    nuke = 1
+#else
+#    nuke = 0
+#fi
+
+
 # Setup client assessment directory
 echo -e "\n${PURPLE}Enter client name for Assessment directory creation [ENTER]:${RESET}"
 read client
