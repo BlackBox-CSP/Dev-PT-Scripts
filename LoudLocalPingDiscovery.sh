@@ -75,6 +75,8 @@ year=`date +%Y`
 clientdir="/root/Assessments/$year/$client"
 mkdir -p $clientdir
 timestamp=`date +%Y_%m_%d`
+# Setup Subnet Range without the /24, etc.
+namerange=${range%/*}
 
 # Launch ping-scan and populate active IP address list
 echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}Discovery ping scan${RESET} on $range"
@@ -85,11 +87,21 @@ sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/&/gp' /tmp/test.txt > "${clientdi
 # FTP
 echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP FTP scan${RESET} on $range"
 #cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap -Pn -n --open -p21 --script ftp-anon,ftp-bounce,ftp-libopie -oG "${clientdir}/${timestamp}-nmap-FTP.txt" -iL -
-cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p21 --script=banner,ftp-anon,ftp-bounce,ftp-libopie -oG "${clientdir}/${timestamp}-nmap-FTP.txt" -iL -
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p21 --script=banner,ftp-anon,ftp-bounce,ftp-libopie -oG "${clientdir}/${timestamp}-${namerange}-nmap-FTP.txt" -iL -
 echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP SSH scan${RESET} on $range"
-cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p22 --script --script=banner,sshv1,ssh2-enum-algos -oG "${clientdir}/${timestamp}-nmap-FTP.txt" -iL -
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p22 --script --script=sshv1,ssh2-enum-algos -oG "${clientdir}/${timestamp}-${namerange}-nmap-SSH.txt" -iL -
 echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP Telnet scan${RESET} on $range"
-cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p23 -oG "${clientdir}/${timestamp}-nmap-Telnet.txt" -iL -
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p23 -oG "${clientdir}/${timestamp}-${namerange}-nmap-Telnet.txt" -iL -
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP SMTP scan${RESET} on $range"
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p25 --script=banner,smtp-enum-users,smtp-open-relay -oG "${clientdir}/${timestamp}-${namerange}-nmap-SMTP.txt" -iL -
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP MS-SQL scan${RESET} on $range"
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p T:1433,U:1434 --script=ms-sql-info -oG "${clientdir}/${timestamp}-${namerange}-nmap-MS-SQL.txt" -iL -
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP RPC scan${RESET} on $range"
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p111 --script=rpcinfo,nfs-showmount,nfs-statfs -oG "${clientdir}/${timestamp}-${namerange}-nmap-RPC.txt" -iL -
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP WinDSX (Badging) scan${RESET} on $range"
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p10002,3001,2101,5555 -oG "${clientdir}/${timestamp}-${namerange}-nmap-WinDSX.txt" -iL -
+echo -e "\n ${GREEN}[+]${RESET} Launching ${GREEN}NMAP OnGuard (Badging) scan${RESET} on $range"
+cat "${clientdir}/${timestamp}-targets.txt" | sort -R | /usr/bin/nmap --scan-delay 5s -g53 -Pn -n -sS --open -p8888,9999,8189 -oG "${clientdir}/${timestamp}-${namerange}-nmap-OnGuard.txt" -iL -
 
 
 
